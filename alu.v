@@ -50,7 +50,8 @@ module alu(sel,A,B,res,neg,zero,carry,overflow);
     assign neg=res[7];
     assign zero=~|res;
 
-endmodule;
+endmodule
+
 
 
 
