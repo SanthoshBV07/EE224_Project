@@ -1,0 +1,26 @@
+module i281cpu(switches, resetn,clk);
+    input resetn,clk;
+    input [15:0] switches;
+    wire [5:0] cmem_read_sel, cmem_write_sel,pc_reg_in;
+    wire [15:0] cmem_write_data, cmem_read_out;
+    wire [18:0] c;
+    wire [26:0] opcode_out;
+    wire [3:0] flag_reg_out, flag_reg_in, dmem_sel;
+    wire [7:0] proc_reg_write_back, proc_reg_out_1, proc_reg_out_2,alu_2,alu_res,write_back_in,dmem_out,dmem_in;
+    assign cmem_write_data = switches;
+    reg_file #(.n(6), .k(16)) cmem (.clk(clk),.resetn(resetn), .w_en(c[1]), .D_in(cmem_write_data), .r_sel(cmem_read_sel), .w_sel(cmem_write_sel), .r_out(cmem_read_out));
+    opcode_dec opdec(.A(cmem_read_out[15:8]), .B(opcode_out));
+    control_logic controller(.op_code(opcode_out),.reg_flags(flag_reg_out), .control_out(c));
+    PC_log PC(cmem_read_sel,cmem_read_out[5:0],c[2],pc_reg_in);
+    register #(.k(6)) pc_reg(c[3],clk,resetn,pc_reg_in,cmem_read_sel);
+    reg_file_1  proc_reg (clk,resetn,c[10],proc_reg_write_back,c[4:5],c[6:7],c[8:9],proc_reg_out_1,proc_reg_out_2);
+    mux_2_1 #(.k(8)) alu_source_mux (proc_reg_out_2,cmem_read_out[7:0],c[11],alu_2);
+    alu proc_alu(c[12:13],proc_reg_out_1,alu_2, alu_res, flag_reg_in[1],flag_reg_in[0],flag_reg_in[3],flag_reg_in[2]);
+    register #(.k(4)) flag_reg(c[14],clk,resetn,flag_reg_in,flag_reg_out);
+    mux_2_1 #(.k(8)) alu_result_mux (alu_res,cmem_read_out[7:0],c[15],write_back_in);
+    mux_2_1 #(.k(8)) result_wb_mux (write_back_in,dmem_out,c[18],proc_reg_write_back);
+    mux_2_1 #(.k(8)) dmem_in_mux (proc_reg_out_2,switches[7:0],c[16],dmem_in);
+    assign cmem_write_sel = write_back_in[5:0];
+    assign dmem_sel = write_back_in[3:0];
+    reg_file #(.n(3), .k(8)) dmem (.clk(clk),.resetn(resetn), .w_en(c[17]), .D_in(dmem_in), .r_sel(dmem_sel), .w_sel(dmem_sel), .r_out(dmem_out));
+endmodule
