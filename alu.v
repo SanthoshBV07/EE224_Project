@@ -1,7 +1,7 @@
 module alu(sel,A,B,res,neg,zero,carry,overflow);
     input [7:0]A,B;
     input [1:0]sel;
-    output signed[7:0]result;
+    output [7:0]result;
     output neg,zero,carry,overflow;
     reg [7:0]shifted_out;
     reg [8:0]temp_sum;
@@ -51,6 +51,7 @@ module alu(sel,A,B,res,neg,zero,carry,overflow);
     assign zero=~|res;
 
 endmodule;
+
 
 
 
