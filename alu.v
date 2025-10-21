@@ -4,12 +4,11 @@ module alu(sel,A,B,res,neg,zero,carry,overflow);
     output [7:0]result;
     output neg,zero,carry,overflow;
     reg [7:0]shifted_out;
-    reg [8:0]temp_sum;
     reg shi;
     wire [7:0]res1,res2,res;
     wire car1,car2,ovf1,ovf2,car,ovf;
     rca rca_instance1(A,B,1'b0,res1,car1,ovf1);
-    rca rca_instance2(A,^B,1'b1,res2,car2,ovf2);
+    rca rca_instance2(A,~B,1'b1,res2,car2,ovf2);
     always@(sel[0],A)
     begin
         if (sel[0]==1'b0) begin
@@ -51,6 +50,7 @@ module alu(sel,A,B,res,neg,zero,carry,overflow);
     assign zero=~|res;
 
 endmodule
+
 
 
 
