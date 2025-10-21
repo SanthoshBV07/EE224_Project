@@ -1,4 +1,4 @@
-module alu(sel,A,B,res,neg,zero,carry,overflow);
+module alu(sel,A,B,result,neg,zero,carry,overflow);
     input [7:0]A,B;
     input [1:0]sel;
     output [7:0]result;
@@ -50,6 +50,7 @@ module alu(sel,A,B,res,neg,zero,carry,overflow);
     assign zero=~|res;
 
 endmodule
+
 
 
 
